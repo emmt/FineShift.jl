@@ -75,8 +75,15 @@ yields a fine shift of array `arr` along the `d`-th dimension.  The shift `t`
 is given in sampling units and may have a fractional part.  If `adj` is true,
 the adjoint of the operator is applied instead.  The fine shift is performed by
 interpolating array `arr` along its `d`-th dimension with kernel function
-`ker`.  The result is an array whose `d`-th dimension is equal to `len` and
-whose other dimensions are identical to those of `arr`.
+`ker`.  The result is an array whose `d`-th dimension has length `len` and
+whose other dimensions have the same length as those of `arr`.
+
+Schematically, assuming `res` is the result of the interpolation and
+unidimensional arrays:
+
+```julia
+res[i] ≈ arr[i - t]    for i = 1, 2, ..., len
+```
 
 See also [`fineshift!`](@ref)
 
@@ -129,12 +136,12 @@ end
 # which 2D interpolation with Catmull-Rom splines requires 36*36*2*7 = 18144
 # floating-point operations.
 #
-#    | Optimizations         | i7-870 @ 2.93GHz        | i7-4790K @ 4.00GHz     |
-#    |:----------------------|:------------------------|:-----------------------|
-#    |                       | 14.966 μs / 1.21 Gflops | 8.357 µs / 2.17 Gflops |
-#    | @inbounds             | 11.080 μs / 1.64 Gflops | 7.709 µs / 2.36 Gflops |
-#    | @inbounds       @simd | 10.400 μs / 1.74 Gflops | 7.313 µs / 2.48 Gflops |
-#    | @inbounds @simd @simd | 11.749 μs / 1.54 Gflops | 7.641 µs / 2.37 Gflops |
+# | Optimizations         | i7-870 @ 2.93GHz        | i7-4790K @ 4.00GHz     |
+# |:----------------------|:------------------------|:-----------------------|
+# |                       | 14.966 μs / 1.21 Gflops | 8.357 µs / 2.17 Gflops |
+# | @inbounds             | 11.080 μs / 1.64 Gflops | 7.709 µs / 2.36 Gflops |
+# | @inbounds       @simd | 10.400 μs / 1.74 Gflops | 7.313 µs / 2.48 Gflops |
+# | @inbounds @simd @simd | 11.749 μs / 1.54 Gflops | 7.641 µs / 2.37 Gflops |
 #
 # The first and second @simd respectively indicate whether vectorization is
 # activated for interpolation along the first and/or others dimensions.
