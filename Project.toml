@@ -1,0 +1,8 @@
+name = "FineShift"
+uuid = "534671aa-9d76-11e9-0200-554c6844f1ff"
+authors = ["Éric Thiébaut <eric.thiebaut@univ-lyon1.fr>"]
+version = "0.1.0"
+
+[deps]
+LazyAlgebra = "aeaa251e-9d76-11e9-311b-83636bf44738"
+LinearInterpolators = "2fc109c4-9d77-11e9-32ff-e5c650334c16"
