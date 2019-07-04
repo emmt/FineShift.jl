@@ -6,7 +6,7 @@ os:
   - osx
 
 julia:
-  - 0.6
+# - 0.6
   - 0.7
   - 1.0
   - 1.1
@@ -18,6 +18,15 @@ matrix:
 
 notifications:
   email: false
+
+before_script:
+  - julia -e 'using Pkg;
+              Pkg.add(PackageSpec(url="https://github.com/emmt/LazyAlgebra.jl", rev="master"));
+              Pkg.add(PackageSpec(url="https://github.com/emmt/LinearInterpolators.jl", rev="master"));'
+
+codecov: true
+
+coveralls: true
 
 #script: # the default script is equivalent to the following
 #  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
