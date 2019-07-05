@@ -17,7 +17,7 @@ import Base.OneTo
 """
 
 ```julia
-fineshift!(dst, src, ker, t, d, adj=false) -> dst
+fineshift!(dst, src, ker, t, d=1, adj=false) -> dst
 ```
 
 overwrites `dst` with a fine shift of array `src` along the `d`-th dimension.
@@ -36,7 +36,7 @@ dst[i,j,k] = sum_jp src[i,jp,k])*ker(j - jp - t)
 with `ker` the interpolation kernel and for all possible indices.  Indices `i`
 and `k` may be multi-dimensional.
 
-For now, the code only works for *flat* boundary conditions.
+For now, only *flat* boundary conditions are implemented.
 
 See also [`fineshift`](@ref)
 
@@ -45,8 +45,8 @@ function fineshift!(dst::AbstractArray{T,N},
                     src::AbstractArray{T,N},
                     ker::Kernel{T,S,<:Union{Flat,SafeFlat}},
                     t::Real,
-                    d::Int,
-                    adj::Bool=false) where {T<:AbstractFloat,N,S}
+                    d::Int = 1,
+                    adj::Bool = false) where {T<:AbstractFloat,N,S}
     # Check arguments.
     1 ≤ d ≤ N || error("out of range dimension")
     srcinds = axes(src)
@@ -57,11 +57,15 @@ function fineshift!(dst::AbstractArray{T,N},
         k == d || last(srcinds[k]) == last(dstinds[k]) ||
             throw(DimensionMismatch("dimensions mismatch"))
     end
-    m = last(dstinds[d]) # number of "rows" of the operator
-    n = last(srcinds[d]) # number of "columns" of the operator
-    I = CartesianIndices(srcinds[1:d-1]) # leadind indices
+    # m and n are the number of "rows" and "columns" of the operator.
+    m = length(dstinds[d])
+    n = length(srcinds[d])
+    if adj
+        fill!(dst, 0)
+        m, n = n, m
+    end
+    I = CartesianIndices(srcinds[1:d-1]) # leading indices
     K = CartesianIndices(srcinds[d+1:N]) # trailing indices
-    adj && fill!(dst, 0)
     return _fineshift!(dst, src, ker, T(t), I, m, n, K, adj)
 end
 
@@ -91,8 +95,8 @@ See also [`fineshift!`](@ref)
 function fineshift(arr::AbstractArray{T,N},
                    ker::Kernel{T,S,<:Union{Flat,SafeFlat}},
                    t::Real,
-                   d::Int,
-                   adj::Bool=false) where {T<:AbstractFloat,N,S}
+                   d::Int = 1,
+                   adj::Bool = false) where {T<:AbstractFloat,N,S}
     return fineshift!(Array{T,N}(undef, size(arr)), arr, ker, t, d, adj)
 
 end
@@ -101,8 +105,8 @@ function fineshift(len::Int,
                    arr::AbstractArray{T,N},
                    ker::Kernel{T,S,<:Union{Flat,SafeFlat}},
                    t::Real,
-                   d::Int,
-                   adj::Bool=false) where {T<:AbstractFloat,N,S}
+                   d::Int = 1,
+                   adj::Bool = false) where {T<:AbstractFloat,N,S}
     dims = ntuple(i -> (i == d ? len : size(arr, i)), Val(N))
     return fineshift!(Array{T,N}(undef, dims), arr, ker, t, d, adj)
 end
@@ -111,8 +115,7 @@ getcoefs(ker::Kernel{T}, t::T) where {T<:AbstractFloat} = _getcoefs(ker, t)
 getcoefs(ker::Kernel{T}, t::Real) where {T<:AbstractFloat} = getcoefs(ker, T(t))
 
 @generated function _getcoefs(ker::Kernel{T,S}, t::T) where {T,S}
-    Core.println(T)
-    W = [Symbol("w",s) for s in 1:S] # all weights
+    W = [Symbol(:w,s) for s in 1:S] # all weights
     return Expr(:block,
                 #Expr(:meta, :inline),
                 Expr(:local, :(l::Int), [:($w::T) for w in W]...),
@@ -120,6 +123,16 @@ getcoefs(ker::Kernel{T}, t::Real) where {T<:AbstractFloat} = getcoefs(ker, T(t))
                 [:($(W[s]) = ker(T(l - $s) - t)) for s in 1:S]...,
                 Expr(:return, Expr(:tuple, :l, W...)))
 end
+
+"""
+```julia
+add(args)
+```
+yields an expression with is the sum of the expressions in `args`.
+
+"""
+add(args::Union{Tuple{Vararg{Expr}},AbstractVector{Expr}}) =
+    Expr(:call, :+, args...)
 
 #
 # The generated function `_fineshift!` was tested with Julia 1.1.1 on 2 Intel
@@ -161,8 +174,8 @@ end
     # The worker function `_fineshift!` assumes that all dimensions have been
     # checked so we can use @inbounds.
     @assert S > 1
-    W = [Symbol("w",s) for s in 1:S] # all generated weights
-    J = [Symbol("j",s) for s in 1:S] # all generated indices
+    W = [Symbol(:w,s) for s in 1:S] # all generated weights
+    J = [Symbol(:j,s) for s in 1:S] # all generated indices
 
     # Generate pieces of code to: compute the interpolation coefficients,
     # compute the indices, apply the direct and apply the adjoint of the
@@ -179,12 +192,6 @@ end
     inds = (:(j0 = j - l),
             [:($(J[s]) = clamp(j0 + $s, 1, n)) for s in 1:S]...)
     if Ni > 0
-        direct = Expr(:(=), :(dst[i, j, k]),
-                      Expr(:call, :+,
-                           [:(src[i, $(J[s]), k]*$(W[s])) for s in 1:S]...))
-        adjoint = Expr(:block,
-                       :(tmp = src[i, j, k]),
-                       [:(dst[i, $(J[s]), k] += $(W[s])*tmp) for s in 1:S]...)
         return quote
             $(coefs...)
             if adj
@@ -192,7 +199,9 @@ end
                     for j in 1:m
                         $(inds...)
                         @simd for i in I
-                            $adjoint
+                            tmp = src[i,j,k]
+                            $([:(dst[i,$(J[s]),k] += $(W[s])*tmp)
+                               for s in 1:S]...)
                         end
                     end
                 end
@@ -201,7 +210,8 @@ end
                     for j in 1:m
                         $(inds...)
                         @simd for i in I
-                            $direct
+                            dst[i,j,k] = $(add([:(src[i,$(J[s]),k]*$(W[s]))
+                                                for s in 1:S]))
                         end
                     end
                 end
@@ -209,26 +219,23 @@ end
             return dst
         end
     else
-        direct = Expr(:(=), :(dst[j, k]),
-                      Expr(:call, :+,
-                           [:(src[$(J[s]), k]*$(W[s])) for s in 1:S]...))
-        adjoint = Expr(:block,
-                       :(tmp = src[j, k]),
-                       [:(dst[$(J[s]), k] += $(W[s])*tmp) for s in 1:S]...)
         return quote
             $(coefs...)
             if adj
                 @inbounds for k in K
                     for j in 1:m
                         $(inds...)
-                        $adjoint
+                        tmp = src[j,k]
+                        $([:(dst[$(J[s]),k] += $(W[s])*tmp)
+                           for s in 1:S]...)
                     end
                 end
             else
                 @inbounds for k in K
                     for j in 1:m
                         $(inds...)
-                        $direct
+                        dst[j,k] = $(add([:(src[$(J[s]),k]*$(W[s]))
+                                          for s in 1:S]))
                     end
                 end
             end
