@@ -1,4 +1,3 @@
-# See example script at https://github.com/JuliaLang/Example.jl
 language: julia
 
 os:
@@ -6,15 +5,13 @@ os:
   - osx
 
 julia:
-# - 0.6
-  - 0.7
   - 1.0
   - 1.1
   - nightly
 
 matrix:
   allow_failures:
-  - julia: nightly
+    - julia: nightly
 
 notifications:
   email: false
@@ -27,13 +24,6 @@ before_script:
 codecov: true
 
 coveralls: true
-
-#script: # the default script is equivalent to the following
-#  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-#  - julia -e 'Pkg.clone(pwd()); Pkg.build("FineShift"); Pkg.test("FineShift"; coverage=true)';
-
-after_success:
-  - julia -e 'if VERSION >= v"0.7.0-" using Pkg end; cd(Pkg.dir("FineShift")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
 
 #jobs:
 #  include:
