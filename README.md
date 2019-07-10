@@ -5,7 +5,9 @@
 | [![][doc-dev-img]][doc-dev-url] | [![][license-img]][license-url] | [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] | [![][coveralls-img]][coveralls-url] [![][codecov-img]][codecov-url] |
 
 **FineShift** is a [**Julia**][julia-url] package for fast sub-sample
-shifting of multi-dimensional arrays.
+shifting of multi-dimensional arrays.  It can also be used to apply separable
+stationary linear filters of small sizes (a.k.a. **discrete correlations**
+or **discrete convolutions**).
 
 [doc-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
 [doc-stable-url]: https://emmt.github.io/FineShift.jl/stable

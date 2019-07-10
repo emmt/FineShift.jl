@@ -29,6 +29,74 @@ function _fineshift(dims::NTuple{N,Int},
                      ker, off[D], D, adj)
 end
 
+
+@testset "Fast correlation code" begin
+    function splitindices(m::Int, n::Int, S::Int, l::Int)
+        # This mimics the splitting of the 1D correlation code in 4 different
+        # intervals.
+        p = S - l
+        i1 = 1 - p
+        i2 = n - p
+        i3 = l - 1 + n
+        I1 = 1:min(i1,m)
+        I2 = max(i1+1,1):min(i2,m)
+        I3 = max(i2+1,1):min(i3-1,m)
+        I4 = max(i3,1):m
+        J = zeros(Int, S)
+        if length(I2) > 0
+            j = first(I2) - l
+            for k in 1:S-1
+                J[k+1] = clamp(j+k,1,n)
+            end
+        elseif length(I3) > 0
+            j = first(I3) - l
+            for k in 1:S-1
+                J[k+1] = clamp(j+k,1,n)
+            end
+        end
+        for i in I1
+            checksplitindices(m, n, S, l, i, 1)
+        end
+        for i in I2
+            J[1:S-1] = J[2:S]
+            J[S] = p + i
+            checksplitindices(m, n, S, l, i, J)
+        end
+        for i in I3
+            J[1:S-1] = J[2:S]
+            checksplitindices(m, n, S, l, i, J)
+        end
+        for i in I4
+            checksplitindices(m, n, S, l, i, n)
+        end
+        return true
+    end
+
+    function checksplitindices(m::Int, n::Int, S::Int, l::Int,
+                               i::Int, Jp::Vector{Int})
+        for k = 1:S
+            j = clamp(i-l+k,1,n)
+            jp = Jp[k]
+            jp == j || error("(i,k)=($i,$k) j=$j, not $jp")
+        end
+    end
+
+    function checksplitindices(m::Int, n::Int, S::Int, l::Int,
+                               i::Int, jp::Int)
+        for k = 1:S
+            j = clamp(i-l+k,1,n)
+            jp == j || error("(i,k)=($i,$k) j=$j, not $jp")
+        end
+    end
+
+    # For offset t and kernel support size S, l = floor(S+1+t), hence to
+    # explore all cases we want t in -(S+1):(S+1), that is l in 0:2(S+1)
+    # with S = 4 (as assumed in the tests) we consider l in -1:10
+    @testset "(l,m,n) = ($l,$m,$n)" for m in (3,6), n in (2,4,8), l in -1:10
+        @test splitindices(m, n, 4, l)
+    end
+end
+
 @testset "Fine shift with zero offset" begin
     @testset "Dimensions: $dims" for dims in ((100,), (20,30), (10,20,30))
         T = Float64
