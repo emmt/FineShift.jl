@@ -269,7 +269,7 @@ function correlate!(dst::AbstractArray{T,N},
                     wgt::NTuple{S,T},
                     d::Int = 1,
                     adj::Bool = false,
-                    opt::Int = 0) where {T<:AbstractFloat,N,S}
+                    opt::Int = Impl.JUMP) where {T<:AbstractFloat,N,S}
     dims, m, n = checkindices(dst, src, d)
     if adj
         fill!(dst, zero(T))
