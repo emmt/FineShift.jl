@@ -9,6 +9,23 @@ shifting of multi-dimensional arrays.  It can also be used to apply separable
 stationary linear filters of small sizes (a.k.a. **discrete correlations**
 or **discrete convolutions**).
 
+FineShift implements fine-shifting of Julia arrays by means of separable
+interpolation.  The interpolation kernels used by FineShift are provided by
+the
+[`InterpolationKernels`](https://github.com/emmt/InterpolationKernels.jl)
+package which must be installed.
+
+
+## Installation
+
+InterpolationKernels and FineShift can be installed by Julia's package
+manager:
+
+```julia
+pkg> add https://github.com/emmt/InterpolationKernels.jl
+pkg> add https://github.com/emmt/FineShift.jl
+```
+
 [doc-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
 [doc-stable-url]: https://emmt.github.io/FineShift.jl/stable
 
