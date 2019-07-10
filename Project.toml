@@ -4,8 +4,10 @@ authors = ["Éric Thiébaut <eric.thiebaut@univ-lyon1.fr>"]
 version = "0.1.0"
 
 [deps]
-LazyAlgebra = "aeaa251e-9d76-11e9-311b-83636bf44738"
-LinearInterpolators = "2fc109c4-9d77-11e9-32ff-e5c650334c16"
+InterpolationKernels = "16730964-a2ec-11e9-36fa-47a4f82bfac6"
+
+[compat]
+julia ="0.7, 1.0, 1.1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

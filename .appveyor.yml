@@ -27,8 +27,7 @@ notifications:
 
 install:
   - ps: iex ((new-object net.webclient).DownloadString("https://raw.githubusercontent.com/JuliaCI/Appveyor.jl/version-1/bin/install.ps1"))
-  - C:\julia\bin\julia -e "if VERSION >= v\"0.7.0-\"; using Pkg; end; Pkg.add(PackageSpec(url=\"https://github.com/emmt/LazyAlgebra.jl\", rev=\"master\"))"
-  - C:\julia\bin\julia -e "if VERSION >= v\"0.7.0-\"; using Pkg; end; Pkg.add(PackageSpec(url=\"https://github.com/emmt/LinearInterpolators.jl\", rev=\"master\"))"
+  - C:\julia\bin\julia -e "if VERSION >= v\"0.7.0-\"; using Pkg; end; Pkg.add(PackageSpec(url=\"https://github.com/emmt/InterpolationKernels.jl\", rev=\"master\"))"
 
 build_script:
   - echo "%JL_BUILD_SCRIPT%"

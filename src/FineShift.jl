@@ -15,8 +15,7 @@ export
     fineshift,
     fineshift!
 
-using LazyAlgebra
-using LinearInterpolators.Kernels
+using InterpolationKernels
 
 include("impl.jl")
 

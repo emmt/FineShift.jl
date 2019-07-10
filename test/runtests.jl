@@ -1,6 +1,6 @@
 module FineShiftTests
 
-using Test, Printf, FineShift, LazyAlgebra, LinearInterpolators
+using Test, Printf, FineShift, InterpolationKernels
 
 function FineShift.fineshift(dims::NTuple{N,Int},
                              src::AbstractArray{T,N},
@@ -29,6 +29,16 @@ function _fineshift(dims::NTuple{N,Int},
                      ker, off[D], D, adj)
 end
 
+function vdot(x::AbstractArray{Tx,N},
+              y::AbstractArray{Ty,N}) where {Tx<:Real,Ty<:Real,N}
+    T = float(promote_type(Tx,Ty))
+    local s::T = 0
+    @assert axes(x) == axes(y)
+    @inbounds for i in eachindex(x, y)
+        s += T(x[i])*T(y[i])
+    end
+    return s
+end
 
 @testset "Fast correlation code" begin
     function splitindices(m::Int, n::Int, S::Int, l::Int)

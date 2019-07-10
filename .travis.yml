@@ -18,8 +18,7 @@ notifications:
 
 before_script:
   - julia -e 'using Pkg;
-              Pkg.add(PackageSpec(url="https://github.com/emmt/LazyAlgebra.jl", rev="master"));
-              Pkg.add(PackageSpec(url="https://github.com/emmt/LinearInterpolators.jl", rev="master"));'
+              Pkg.add(PackageSpec(url="https://github.com/emmt/InterpolationKernels.jl", rev="master"));'
 
 codecov: true
 

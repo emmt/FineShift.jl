@@ -1,6 +1,6 @@
 module FineShiftBenchmarks
 using Printf
-using LinearInterpolators
+using InterpolationKernels
 using BenchmarkTools
 using FineShift
 using FineShift.Impl: Adjoint, Direct
