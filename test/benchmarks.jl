@@ -10,7 +10,7 @@ if PLOTTING
     using PyPlot, YPlot
     const plt = PyPlot
 end
-include("../src/alt.jl")
+include("alt.jl")
 
 function testalternatives()
     T = Float64
