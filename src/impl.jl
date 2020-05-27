@@ -351,7 +351,7 @@ const Operand = Union{Expr,Symbol}
 # Tuple of operands.
 const Operands = Tuple{Vararg{Operand}}
 
-# Paris that acn be converted to a tuple of operands.
+# Paris that can be converted to a tuple of operands.
 const Listable = Union{Tuple{Function,Integer},
                        Tuple{Function,Val}}
 
