@@ -15,6 +15,7 @@ export
     fineshift,
     fineshift!
 
+using ArrayTools
 using InterpolationKernels
 
 include("impl.jl")
@@ -287,24 +288,6 @@ end
 # UTILITIES
 
 """
-
-```julia
-dimensions(A)
-```
-
-yields the list of dimensions of array `A`, like `size(A)` but throws
-an error if `A` has non-standard indices.
-
-"""
-@inline function dimensions(A::AbstractArray{T,N}) where {T,N}
-    inds = axes(A)
-    @inbounds for d in 1:N
-        first(inds[d]) == 1 || throw_non_standard_indices()
-    end
-    return size(A)
-end
-
-"""
 ```julia
 checkindices(A, B, d) -> dims, m, n
 ```
@@ -318,8 +301,8 @@ their `d`-th dimension and return `dims = size(A)`, `m = size(A,d)` and
                               B::AbstractArray{<:Any,N},
                               d::Int) where {N}
     1 ≤ d ≤ N || throw_out_of_range_dimension_index()
-    Adims = dimensions(A)
-    Bdims = dimensions(B)
+    Adims = standard_size(A)
+    Bdims = standard_size(B)
     @inbounds begin
         for k in 1:N
             k == d || Adims[k] == Bdims[k] ||
