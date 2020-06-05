@@ -16,10 +16,6 @@ matrix:
 notifications:
   email: false
 
-before_script:
-  - julia -e 'using Pkg;
-              Pkg.add(PackageSpec(url="https://github.com/emmt/InterpolationKernels.jl", rev="master"));'
-
 codecov: true
 
 coveralls: true
