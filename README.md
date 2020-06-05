@@ -1,8 +1,8 @@
 # FineShift Package
 
-| **Documentation**               | **License**                     | **Build Status**                                                | **Code Coverage**                                                   |
-|:--------------------------------|:--------------------------------|:----------------------------------------------------------------|:--------------------------------------------------------------------|
-| [![][doc-dev-img]][doc-dev-url] | [![][license-img]][license-url] | [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] | [![][coveralls-img]][coveralls-url] [![][codecov-img]][codecov-url] |
+| **License**                     | **Build Status**                                                | **Code Coverage**                                                   |
+|:--------------------------------|:----------------------------------------------------------------|:--------------------------------------------------------------------|
+| [![][license-img]][license-url] | [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] | [![][coveralls-img]][coveralls-url] [![][codecov-img]][codecov-url] |
 
 **FineShift** is a [**Julia**][julia-url] package for fast sub-sample
 shifting of multi-dimensional arrays.  It can also be used to apply separable
@@ -10,18 +10,29 @@ stationary linear filters of small sizes (a.k.a. **discrete correlations**
 or **discrete convolutions**).
 
 FineShift implements fine-shifting of Julia arrays by means of separable
-interpolation.  The interpolation kernels used by FineShift are provided by
-the
-[`InterpolationKernels`](https://github.com/emmt/InterpolationKernels.jl)
-package which must be installed.
+interpolation.  After installation (see below), calling `using FineShift`
+provides the following methods:
+
+- `fineshift` for fine-shifting along a dimension;
+- `fineshift!` is an in-place version of for `fineshift`;
+- `convolve` for separable convolution by a small sampled kernel;
+- `convolve!` is an in-place version of for `convolve`;
+- `correlate` for separable correlation by a small sampled kernel;
+- `correlate!` is an in-place version of for `correlate`;
 
 
 ## Installation
 
-InterpolationKernels and FineShift can be installed by Julia's package
-manager:
+The interpolation kernels used by FineShift are provided by the
+[`InterpolationKernels`](https://github.com/emmt/InterpolationKernels.jl)
+package which must be installed and some utilities from
+[`ArrayTools`](https://github.com/emmt/ArrayTools.jl) are also needed.  .
+
+ArrayTools, InterpolationKernels and FineShift can be installed by Julia's
+package manager:
 
 ```julia
+pkg> add https://github.com/emmt/ArrayTools.jl
 pkg> add https://github.com/emmt/InterpolationKernels.jl
 pkg> add https://github.com/emmt/FineShift.jl
 ```

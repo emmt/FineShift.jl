@@ -26,12 +26,11 @@ include("impl.jl")
 fineshift!(dst, src, ker, t, d=1, adj=false) -> dst
 ```
 
-overwrites `dst` with a fine shift of array `src` along the `d`-th dimension.
-The shift `t` is given in sampling units and may have a fractional part.  If
-`adj` is true, the adjoint of the operator is applied instead.  The fine shift
-is performed by interpolating array `src` along its `d`-th dimension with
-kernel function `ker`.  Arrays `src` and `dst` must have the same
-non-interpolated dimensions (all the dimensions but the `d`-th one).
+overwrites `dst` with array `src` shifted along its `d`-th dimension.  The
+shift `t` is given in sampling units and may have a fractional part.  The
+shift is performed by interpolating array `src` along its `d`-th dimension
+with kernel function `ker`.  Arrays `src` and `dst` must have the same
+non-interpolated dimensions (all dimensions but the `d`-th one).
 
 The result of the operation amounts to doing:
 
@@ -39,10 +38,13 @@ The result of the operation amounts to doing:
 dst[i,j,k] = sum_jp src[i,jp,k])*ker(j - jp - t)
 ```
 
-with `ker` the interpolation kernel and for all possible indices.  Indices `i`
-and `k` may be multi-dimensional.
+with `ker` the interpolation kernel and for all possible indices.  Indices
+`i` and `k` may be multi-dimensional (including 0-dimensional).
 
 For now, only *flat* boundary conditions are implemented.
+
+If optional argument `adj` is true, the adjoint of the linear operator
+implemented by this method is applied instead.
 
 See also [`fineshift`](@ref), [`correlate!`](@ref),
 
@@ -63,12 +65,12 @@ end
 fineshift([len=size(arr,d)], arr, ker, t, d=1, adj=false)
 ```
 
-yields a fine shift of array `arr` along the `d`-th dimension.  The shift `t`
-is given in sampling units and may have a fractional part.  If `adj` is true,
-the adjoint of the operator is applied instead.  The fine shift is performed by
-interpolating array `arr` along its `d`-th dimension with kernel function
-`ker`.  The result is an array whose `d`-th dimension has length `len` and
-whose other dimensions have the same length as those of `arr`.
+yields array `arr` shifted along its `d`-th dimension.  The shift `t` is
+given in sampling units and may have a fractional part.  The shift is
+performed by interpolating array `arr` along its `d`-th dimension with
+kernel function `ker`.  The result is an array whose `d`-th dimension has
+length `len` and whose other dimensions have the same length as those of
+`arr`.
 
 Schematically, assuming `res` is the result of the interpolation and
 unidimensional arrays:
@@ -76,6 +78,9 @@ unidimensional arrays:
 ```julia
 res[i] ≈ arr[i - t]    for i = 1, 2, ..., len
 ```
+
+If optional argument `adj` is true, the adjoint of the linear operator
+implemented by this method is applied instead.
 
 See also [`fineshift!`](@ref)
 
@@ -104,9 +109,9 @@ shiftparams(ker, t) -> off, wgt
 ```
 
 yields the parameters for fine-shifting an array along one of its dimension
-by amount `t` and by means of interpolation with kernel `ker`.  The returned
-values are `off` an integer offset and `wgt` a `S`-tuple of interpolation
-weights with `S` the size of the support of `ker`.
+by amount `t` and by means of interpolation with kernel `ker`.  The
+returned values are `off`, an integer offset, and `wgt`, a `S`-tuple of
+interpolation weights with `S` the size of the support of `ker`.
 
 To perform the fine-shifting a source vector `src`, the destination vector
 `dst` should be computed as:
@@ -151,7 +156,8 @@ yields the discrete convolution of array `arr` by weights `wgt` with offset
 dimension has length `len` and whose other dimensions have the same length
 as those of `arr`.
 
-If `adj` is true, the adjoint of the operator is applied instead.
+If optional argument `adj` is true, the adjoint of the linear operator
+implemented by this method is applied instead.
 
 See also [`convolve!`](@ref)
 
@@ -191,8 +197,8 @@ dst[i] = sum_{k=1}^{S} wgt[k]*src[clamp(i-off-k,1,n)]
 
 with `S=length(wgt)` and `n=length(x)` for all `i ∈ 1:lenght(y)`.
 
-If argument `adj` is true, the adjoint of the linear operator implemented
-by the `convolve!` method is applied.
+If optional argument `adj` is true, the adjoint of the linear operator
+implemented by this method is applied instead.
 
 See also: [`convolve`](@ref), [`correlate!`](@ref).
 
@@ -216,7 +222,8 @@ yields the discrete correlation of array `arr` by weights `wgt` with offset
 dimension has length `len` and whose other dimensions have the same length
 as those of `arr`.
 
-If `adj` is true, the adjoint of the operator is applied instead.
+If optional argument `adj` is true, the adjoint of the linear operator
+implemented by this method is applied instead.
 
 See also [`correlate!`](@ref)
 
@@ -256,8 +263,8 @@ dst[i] = sum_{k=1}^{S} wgt[k]*src[clamp(i-off+k,1,n)]
 
 with `S=length(wgt)` and `n=length(x)` for all `i ∈ 1:lenght(y)`.
 
-If argument `adj` is true, the adjoint of the linear operator
-implemented by the `correlate!` method is applied.
+If optional argument `adj` is true, the adjoint of the linear operator
+implemented by this method is applied instead.
 
 See also: [`correlate`](@ref), [`fineshift!`](@ref),
 [`shiftparams!`](@ref), [`correlate!`](@ref).
@@ -274,12 +281,12 @@ function correlate!(dst::AbstractArray{T,N},
     if adj
         fill!(dst, zero(T))
         #@assert m ≥ 1
-        Impl._correlate!(Impl.Adjoint(),
-                         opt, dst, src, off, wgt, d, dims, n, m)
+        Impl.correlate!(Impl.Adjoint(),
+                        opt, dst, src, off, wgt, d, dims, n, m)
     else
         #@assert n ≥ 1
-        Impl._correlate!(Impl.Direct(),
-                         opt, dst, src, off, wgt, d, dims, m, n)
+        Impl.correlate!(Impl.Direct(),
+                        opt, dst, src, off, wgt, d, dims, m, n)
     end
     return dst
 end
