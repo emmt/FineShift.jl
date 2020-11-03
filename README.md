@@ -46,8 +46,8 @@ pkg> add https://github.com/emmt/FineShift.jl
 [license-url]: ./LICENSE.md
 [license-img]: http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat
 
-[travis-img]: https://travis-ci.org/emmt/FineShift.jl.svg?branch=master
-[travis-url]: https://travis-ci.org/emmt/FineShift.jl
+[travis-img]: https://travis-ci.com/emmt/FineShift.jl.svg?branch=master
+[travis-url]: https://travis-ci.com/emmt/FineShift.jl
 
 [appveyor-img]: https://ci.appveyor.com/api/projects/status/github/emmt/FineShift.jl?branch=master
 [appveyor-url]: https://ci.appveyor.com/project/emmt/FineShift-jl/branch/master
