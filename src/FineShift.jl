@@ -135,8 +135,8 @@ shiftparams(ker::Kernel{T,S}, t::Real) where {T<:AbstractFloat,S} =
 
 @generated function shiftparams(ker::Kernel{T,S},
                                 t::T) where {T<:AbstractFloat,S}
-    W = ntuple(k -> Symbol(:w,k), Val(S))
-    c = T(S + 2)/T(2) # 1 + S/2 # variable names for all weights
+    W = ntuple(k -> Symbol(:w,k), Val(S)) # variable names for all weights
+    c = T(S + 2)/T(2) # c = 1 + S/2
     quote
         off = floor($c + t)
         v = off - t
@@ -295,9 +295,7 @@ end
 # UTILITIES
 
 """
-```julia
-checkindices(A, B, d) -> dims, m, n
-```
+    checkindices(A, B, d) -> dims, m, n
 
 checks the indices of arguments `A` and `B` for a separable operation along
 their `d`-th dimension and return `dims = size(A)`, `m = size(A,d)` and
