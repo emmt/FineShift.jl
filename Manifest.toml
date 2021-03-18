@@ -1,55 +1,15 @@
 # This file is machine-generated - editing it directly is not advised
 
 [[ArrayTools]]
-git-tree-sha1 = "6c8d1e1807262c920c82d02564c25969fdbbc5c9"
+git-tree-sha1 = "133bc65cb1241014956be71aaae9bb309519a1a3"
 repo-rev = "master"
 repo-url = "https://github.com/emmt/ArrayTools.jl"
 uuid = "1dc0ca97-c5ce-4e77-ac6d-c576ac9d7f27"
-version = "0.1.0"
-
-[[Base64]]
-uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
-
-[[Distributed]]
-deps = ["Random", "Serialization", "Sockets"]
-uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
-
-[[InteractiveUtils]]
-deps = ["Markdown"]
-uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+version = "0.2.1"
 
 [[InterpolationKernels]]
-deps = ["InteractiveUtils", "Printf"]
-git-tree-sha1 = "cc56b56ea81879c5b87577296777d0399ed7ff5e"
+git-tree-sha1 = "1612c15fc902293d1232c93924740f54edc88c6c"
 repo-rev = "master"
 repo-url = "https://github.com/emmt/InterpolationKernels.jl"
 uuid = "16730964-a2ec-11e9-36fa-47a4f82bfac6"
-version = "0.1.0"
-
-[[Logging]]
-uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
-
-[[Markdown]]
-deps = ["Base64"]
-uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
-
-[[Printf]]
-deps = ["Unicode"]
-uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
-
-[[Random]]
-deps = ["Serialization"]
-uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
-
-[[Serialization]]
-uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
-
-[[Sockets]]
-uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
-
-[[Test]]
-deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]
-uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
-[[Unicode]]
-uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+version = "0.2.0"
