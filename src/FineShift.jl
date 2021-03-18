@@ -105,31 +105,28 @@ To perform the fine-shifting a source vector `src`, the destination vector
 `dst` should be computed as:
 
     dst[i] = wgt[1]*src[i-off+1] + ... + wgt[k]*src[i-off+k] +
-             ... + wgt[k]*src[i-off+S]
+             ... + wgt[S]*src[i-off+S]
 
-that is the sum of `wgt[k]*src[i-off+k]` for `k = 1, ..., S`.
+that is the sum of `wgt[k]*src[i-off+k]` for `k = 1, ..., S` with `S` the
+number of interpolation weights.
 
 !!! note
-    For out of range indices `j = i-off+k`, the value taken by `src[i-off+k]`
+    For out of range indices `k = i-off+k`, the value taken by `src[i-off+k]`
     depends on the chosen boundary conditions.
 
 See the note `fast-interpolation.md` for detailed explanations.
 
 """
-shiftparams(ker::Kernel{T,S}, t::Real) where {T<:AbstractFloat,S} =
-    shiftparams(ker, T(t))
-
-@generated function shiftparams(ker::Kernel{T,S},
-                                t::T) where {T<:AbstractFloat,S}
-    W = ntuple(k -> Symbol(:w,k), Val(S)) # variable names for all weights
-    c = T(S + 2)/T(2) # c = 1 + S/2
-    quote
-        off = floor($c + t)
-        v = off - t
-        $(ntuple(k -> :($(W[k]) = ker(v - $k)), Val(S))...)
-        return (Int(off), ($(W...),))
-    end
+function shiftparams(ker::Kernel{T}, t::Real) where {T}
+    off, wgt = InterpolationKernels.compute_offset_and_weights(ker, -T(t))
+    return safe_int(-off), wgt
 end
+
+# Convert `x` to an integer of type `Int` taking care of overflows but not
+# of "inexact errors".
+safe_int(x::Int) = x
+safe_int(x::Real) = (x ≤ typemin(Int) ? typemin(Int) :
+                     x ≥ typemax(Int) ? typemax(Int) : Int(x))
 
 """
     convolve([len=size(arr,d)], arr, off, wgt, d=1, adj=false, opt=Val(0))
@@ -173,9 +170,9 @@ kernel whose coefficients are given by `wgt` and with an offset `off` along the
 
 The call is equivalent to computing:
 
-    dst[i] = sum_{k=1}^{S} wgt[k]*src[clamp(i-off-k,1,n)]
+    dst[i] = sum_{k ∈ 1:S} wgt[k]*src[clamp(i-off-k,1,n)]
 
-with `S=length(wgt)` and `n=length(x)` for all `i ∈ 1:lenght(y)`.
+with `S = length(wgt)` and `n = length(x)` for all `i ∈ 1:lenght(dst)`.
 
 If optional argument `adj` is true, the adjoint of the linear operator
 implemented by this method is applied instead.
@@ -188,6 +185,8 @@ function convolve!(dst::AbstractArray{T,N},
                    off::Int,
                    wgt::NTuple{S,T},
                    args...) where {T<:AbstractFloat,N,S}
+    # We really want to compute a discrete correlation because addressing array
+    # entries in increasing order is the key for vectorization.
     return correlate!(dst, src, off, reverse(wgt), args...)
 end
 
@@ -234,9 +233,9 @@ arguments.  Flat boundary conditions are assumed.
 
 The call is equivalent to computing:
 
-    dst[i] = sum_{k=1}^{S} wgt[k]*src[clamp(i-off+k,1,n)]
+    dst[i] = sum_{k ∈ 1:S} wgt[k]*src[clamp(i-off+k,1,n)]
 
-with `S=length(wgt)` and `n=length(x)` for all `i ∈ 1:lenght(y)`.
+with `S = length(wgt)` and `n = length(x)` for all `i ∈ 1:lenght(dst)`.
 
 If optional argument `adj` is true, the adjoint of the linear operator
 implemented by this method is applied instead.
