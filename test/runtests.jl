@@ -1,6 +1,24 @@
 module FineShiftTests
 
-using Test, Printf, FineShift, InterpolationKernels
+using Test, FineShift, InterpolationKernels
+
+function randu(T::Type{<:AbstractFloat}; max::Real=1, min::Real=0)
+    _min = T(min)
+    _max = T(max)
+    return (_max - _min)*rand(T) + _min
+end
+
+function randu(T::Type{<:AbstractFloat}, dims::Dims; max::Real=1, min::Real=0)
+    A = rand(T, dims)
+    if max != 1 || min != 0
+        a = T(max) - T(min)
+        b = T(min)
+        @inbounds @simd for i in eachindex(A)
+            A[i] = a*A[i] + b
+        end
+    end
+    return A
+end
 
 function FineShift.fineshift(dims::NTuple{N,Int},
                              src::AbstractArray{T,N},
@@ -111,8 +129,8 @@ end
     @testset "Dimensions: $dims" for dims in ((100,), (20,30), (10,20,30))
         T = Float64
         N = length(dims)
-        ker = CatmullRomSpline(T)
-        src = rand(T, dims)
+        ker = CatmullRomSpline{T}()
+        src = randu(T, dims; min=-1, max=1)
         off = ntuple(i -> zero(T), N)
         dst = fineshift(dims, src, ker, off)
         @test dst == src
@@ -123,12 +141,12 @@ end
     @testset "Dimensions: $dims" for dims in ((100,), (20,30), (10,20,30))
         T = Float64
         N = length(dims)
-        ker = CatmullRomSpline(T)
+        ker = CatmullRomSpline{T}()
         xdims = dims
         ydims = ntuple(d -> (isodd(d) ? dims[d] - 1 : dims[d] + 2), N)
-        x = randn(T, xdims)
-        y = randn(T, ydims)
-        off = ntuple(i -> randn(T), N)
+        x = randu(T, xdims; min=-1, max=1)
+        y = randu(T, ydims; min=-1, max=1)
+        off = ntuple(i -> randu(T; min=-3, max=3), N)
         @test (vdot(y, fineshift(ydims, x, ker, off, false)) ≈
                vdot(x, fineshift(xdims, y, ker, off, true )))
     end

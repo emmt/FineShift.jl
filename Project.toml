@@ -1,7 +1,7 @@
 name = "FineShift"
 uuid = "534671aa-9d76-11e9-0200-554c6844f1ff"
 authors = ["Éric Thiébaut <https://github.com/emmt>"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 ArrayTools = "1dc0ca97-c5ce-4e77-ac6d-c576ac9d7f27"
@@ -9,12 +9,11 @@ InterpolationKernels = "16730964-a2ec-11e9-36fa-47a4f82bfac6"
 
 [compat]
 julia ="1.0"
-InterpolationKernels = "0.1"
+ArrayTools = "0.2.0"
+InterpolationKernels = "0.2.0"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
-Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [targets]
-test = ["Test", "Printf", "Random"]
+test = ["Test"]

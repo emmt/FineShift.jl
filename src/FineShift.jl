@@ -21,25 +21,20 @@ using InterpolationKernels
 include("impl.jl")
 
 """
-
-```julia
-fineshift!(dst, src, ker, t, d=1, adj=false) -> dst
-```
+    fineshift!(dst, src, ker, t, d=1, adj=false) -> dst
 
 overwrites `dst` with array `src` shifted along its `d`-th dimension.  The
-shift `t` is given in sampling units and may have a fractional part.  The
-shift is performed by interpolating array `src` along its `d`-th dimension
-with kernel function `ker`.  Arrays `src` and `dst` must have the same
+shift `t` is given in sampling units and may have a fractional part.  The shift
+is performed by interpolating array `src` along its `d`-th dimension with
+kernel function `ker`.  Arrays `src` and `dst` must have the same
 non-interpolated dimensions (all dimensions but the `d`-th one).
 
 The result of the operation amounts to doing:
 
-```julia
-dst[i,j,k] = sum_jp src[i,jp,k])*ker(j - jp - t)
-```
+    dst[i,j,k] = sum_jp src[i,jp,k])*ker(j - jp - t)
 
-with `ker` the interpolation kernel and for all possible indices.  Indices
-`i` and `k` may be multi-dimensional (including 0-dimensional).
+with `ker` the interpolation kernel and for all possible indices.  Indices `i`
+and `k` may be multi-dimensional (including 0-dimensional).
 
 For now, only *flat* boundary conditions are implemented.
 
@@ -51,7 +46,7 @@ See also [`fineshift`](@ref), [`correlate!`](@ref),
 """
 function fineshift!(dst::AbstractArray{T,N},
                     src::AbstractArray{T,N},
-                    ker::Kernel{T,S,<:Union{Flat,SafeFlat}},
+                    ker::Kernel{T,S},
                     t::Real,
                     d::Int = 1,
                     opt::Union{Bool,Val} = false) where {T<:AbstractFloat,N,S}
@@ -60,33 +55,29 @@ function fineshift!(dst::AbstractArray{T,N},
 end
 
 """
+    fineshift([len=size(arr,d)], arr, ker, t, d=1, adj=false)
 
-```julia
-fineshift([len=size(arr,d)], arr, ker, t, d=1, adj=false)
-```
-
-yields array `arr` shifted along its `d`-th dimension.  The shift `t` is
-given in sampling units and may have a fractional part.  The shift is
-performed by interpolating array `arr` along its `d`-th dimension with
-kernel function `ker`.  The result is an array whose `d`-th dimension has
-length `len` and whose other dimensions have the same length as those of
-`arr`.
+yields array `arr` shifted along its `d`-th dimension.  The shift `t` is given
+in sampling units and may have a fractional part.  The shift is performed by
+interpolating array `arr` along its `d`-th dimension with kernel function
+`ker`.  The result is an array whose `d`-th dimension has length `len` and
+whose other dimensions have the same length as those of `arr`.
 
 Schematically, assuming `res` is the result of the interpolation and
 unidimensional arrays:
 
-```julia
-res[i] ≈ arr[i - t]    for i = 1, 2, ..., len
-```
+    res[i] ≈ arr[i - t]    for i = 1, 2, ..., len
 
 If optional argument `adj` is true, the adjoint of the linear operator
 implemented by this method is applied instead.
+
+For now, only *flat* boundary conditions are implemented.
 
 See also [`fineshift!`](@ref)
 
 """
 function fineshift(arr::AbstractArray{T,N},
-                   ker::Kernel{T,S,<:Union{Flat,SafeFlat}},
+                   ker::Kernel{T,S},
                    t::Real,
                    args...) where {T<:AbstractFloat,N,S}
     return fineshift!(Array{T,N}(undef, size(arr)), arr, ker, t, args...)
@@ -94,7 +85,7 @@ end
 
 function fineshift(len::Int,
                    arr::AbstractArray{T,N},
-                   ker::Kernel{T,S,<:Union{Flat,SafeFlat}},
+                   ker::Kernel{T,S},
                    t::Real,
                    d::Int = 1,
                    args...) where {T<:AbstractFloat,N,S}
@@ -103,23 +94,18 @@ function fineshift(len::Int,
 end
 
 """
+    shiftparams(ker, t) -> off, wgt
 
-```julia
-shiftparams(ker, t) -> off, wgt
-```
-
-yields the parameters for fine-shifting an array along one of its dimension
-by amount `t` and by means of interpolation with kernel `ker`.  The
-returned values are `off`, an integer offset, and `wgt`, a `S`-tuple of
-interpolation weights with `S` the size of the support of `ker`.
+yields the parameters for fine-shifting an array along one of its dimension by
+amount `t` and by means of interpolation with kernel `ker`.  The returned
+values are `off`, an integer offset, and `wgt`, a `S`-tuple of interpolation
+weights with `S` the size of the support of `ker`.
 
 To perform the fine-shifting a source vector `src`, the destination vector
 `dst` should be computed as:
 
-```
-dst[i] = wgt[1]*src[i-off+1] + ... + wgt[k]*src[i-off+k] +
-         ... + wgt[k]*src[i-off+S]
-```
+    dst[i] = wgt[1]*src[i-off+1] + ... + wgt[k]*src[i-off+k] +
+             ... + wgt[k]*src[i-off+S]
 
 that is the sum of `wgt[k]*src[i-off+k]` for `k = 1, ..., S`.
 
@@ -146,18 +132,17 @@ shiftparams(ker::Kernel{T,S}, t::Real) where {T<:AbstractFloat,S} =
 end
 
 """
-
-```julia
-convolve([len=size(arr,d)], arr, off, wgt, d=1, adj=false, opt=Val(0))
-```
+    convolve([len=size(arr,d)], arr, off, wgt, d=1, adj=false, opt=Val(0))
 
 yields the discrete convolution of array `arr` by weights `wgt` with offset
 `off` along the `d`-th dimension.  The result is an array whose `d`-th
-dimension has length `len` and whose other dimensions have the same length
-as those of `arr`.
+dimension has length `len` and whose other dimensions have the same length as
+those of `arr`.
 
 If optional argument `adj` is true, the adjoint of the linear operator
 implemented by this method is applied instead.
+
+For now, only *flat* boundary conditions are implemented.
 
 See also [`convolve!`](@ref)
 
@@ -180,20 +165,15 @@ function convolve(len::Int,
 end
 
 """
-
-```julia
-convolve!(dst, src, off, wgt, d=1, adj=false, opt=Val(0)) -> dst
-```
+    convolve!(dst, src, off, wgt, d=1, adj=false, opt=Val(0)) -> dst
 
 overwrites the contents of `dst` with the discrete convolution of `src` by a
-kernel whose coefficients are given by `wgt` and with an offset `off` along
-the `d`-th dimension.  Flat boundary conditions are assumed.
+kernel whose coefficients are given by `wgt` and with an offset `off` along the
+`d`-th dimension.  Flat boundary conditions are assumed.
 
 The call is equivalent to computing:
 
-```
-dst[i] = sum_{k=1}^{S} wgt[k]*src[clamp(i-off-k,1,n)]
-```
+    dst[i] = sum_{k=1}^{S} wgt[k]*src[clamp(i-off-k,1,n)]
 
 with `S=length(wgt)` and `n=length(x)` for all `i ∈ 1:lenght(y)`.
 
@@ -212,18 +192,17 @@ function convolve!(dst::AbstractArray{T,N},
 end
 
 """
-
-```julia
-correlate([len=size(arr,d)], arr, off, wgt, d=1, adj=false, opt=Val(0))
-```
+    correlate([len=size(arr,d)], arr, off, wgt, d=1, adj=false, opt=Val(0))
 
 yields the discrete correlation of array `arr` by weights `wgt` with offset
 `off` along the `d`-th dimension.  The result is an array whose `d`-th
-dimension has length `len` and whose other dimensions have the same length
-as those of `arr`.
+dimension has length `len` and whose other dimensions have the same length as
+those of `arr`.
 
 If optional argument `adj` is true, the adjoint of the linear operator
 implemented by this method is applied instead.
+
+For now, only *flat* boundary conditions are implemented.
 
 See also [`correlate!`](@ref)
 
@@ -246,20 +225,16 @@ function correlate(len::Int,
 end
 
 """
-```julia
-correlate!(dst, src, off, wgt, d=1, adj=false, opt=Val(0))
-```
+    correlate!(dst, src, off, wgt, d=1, adj=false, opt=Val(0))
 
 overwrite the contents of `dst` with the discrete correlation of `src` by a
-kernel whose coefficients are given by `wgt` and with an offset `off` along
-the `d`-th dimension.  See [`shiftparams`](@ref) for a description of these
-latter arguments.  Flat boundary conditions are assumed.
+kernel whose coefficients are given by `wgt` and with an offset `off` along the
+`d`-th dimension.  See [`shiftparams`](@ref) for a description of these latter
+arguments.  Flat boundary conditions are assumed.
 
 The call is equivalent to computing:
 
-```
-dst[i] = sum_{k=1}^{S} wgt[k]*src[clamp(i-off+k,1,n)]
-```
+    dst[i] = sum_{k=1}^{S} wgt[k]*src[clamp(i-off+k,1,n)]
 
 with `S=length(wgt)` and `n=length(x)` for all `i ∈ 1:lenght(y)`.
 
