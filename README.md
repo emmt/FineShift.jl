@@ -2,7 +2,7 @@
 
 | **License**                     | **Build Status**                                                | **Code Coverage**                                                   |
 |:--------------------------------|:----------------------------------------------------------------|:--------------------------------------------------------------------|
-| [![][license-img]][license-url] | [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] | [![][coveralls-img]][coveralls-url] [![][codecov-img]][codecov-url] |
+| [![License][License-img]][license-url] | [![Build Status][github-ci-img]][github-ci-url] [![Build Status][appveyor-img]][appveyor-url] | [![Code Coverage][coveralls-img]][coveralls-url] [![Code Coverage][codecov-img]][codecov-url] |
 
 **FineShift** is a [**Julia**][julia-url] package for fast sub-sample
 shifting of multi-dimensional arrays.  It can also be used to apply separable
@@ -46,8 +46,8 @@ pkg> add https://github.com/emmt/FineShift.jl
 [license-url]: ./LICENSE.md
 [license-img]: http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat
 
-[travis-img]: https://travis-ci.org/emmt/FineShift.jl.svg?branch=master
-[travis-url]: https://travis-ci.org/emmt/FineShift.jl
+[github-ci-img]: https://github.com/emmt/FineShift.jl/actions/workflows/CI.yml/badge.svg?branch=master
+[github-ci-url]: https://github.com/emmt/FineShift.jl/actions/workflows/CI.yml?query=branch%3Amaster
 
 [appveyor-img]: https://ci.appveyor.com/api/projects/status/github/emmt/FineShift.jl?branch=master
 [appveyor-url]: https://ci.appveyor.com/project/emmt/FineShift-jl/branch/master
