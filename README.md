@@ -23,18 +23,14 @@ provides the following methods:
 
 ## Installation
 
-The interpolation kernels used by FineShift are provided by the
-[`InterpolationKernels`](https://github.com/emmt/InterpolationKernels.jl)
-package which must be installed and some utilities from
-[`ArrayTools`](https://github.com/emmt/ArrayTools.jl) are also needed.  .
-
-ArrayTools, InterpolationKernels and FineShift can be installed by Julia's
-package manager:
+The easiest way to install `FineShift` is via Julia registry
+[`EmmtRegistry`](https://github.com/emmt/EmmtRegistry):
 
 ```julia
-pkg> add https://github.com/emmt/ArrayTools.jl
-pkg> add https://github.com/emmt/InterpolationKernels.jl
-pkg> add https://github.com/emmt/FineShift.jl
+using Pkg
+pkg"registry add General" # if you have not yet any registries
+pkg"registry add https://github.com/emmt/EmmtRegistry"
+pkg"add FineShift"
 ```
 
 [doc-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
