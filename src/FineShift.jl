@@ -172,7 +172,7 @@ The call is equivalent to computing:
 
     dst[i] = sum_{k ∈ 1:S} wgt[k]*src[clamp(i-off-k,1,n)]
 
-with `S = length(wgt)` and `n = length(x)` for all `i ∈ 1:lenght(dst)`.
+with `S = length(wgt)` and `n = length(x)` for all `i ∈ 1:length(dst)`.
 
 If optional argument `adj` is true, the adjoint of the linear operator
 implemented by this method is applied instead.
@@ -235,7 +235,7 @@ The call is equivalent to computing:
 
     dst[i] = sum_{k ∈ 1:S} wgt[k]*src[clamp(i-off+k,1,n)]
 
-with `S = length(wgt)` and `n = length(x)` for all `i ∈ 1:lenght(dst)`.
+with `S = length(wgt)` and `n = length(x)` for all `i ∈ 1:length(dst)`.
 
 If optional argument `adj` is true, the adjoint of the linear operator
 implemented by this method is applied instead.
