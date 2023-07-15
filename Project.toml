@@ -8,9 +8,9 @@ ArrayTools = "1dc0ca97-c5ce-4e77-ac6d-c576ac9d7f27"
 InterpolationKernels = "16730964-a2ec-11e9-36fa-47a4f82bfac6"
 
 [compat]
-ArrayTools = "0.2.0"
-InterpolationKernels = "0.2.0"
-julia = "1.0"
+ArrayTools = "0.2, 0.3"
+InterpolationKernels = "0.2"
+julia = "1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
